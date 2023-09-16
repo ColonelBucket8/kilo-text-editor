@@ -290,6 +290,15 @@ void editorRowInsertChar(erow *row, int at, int c) {
   editorUpdateRow(row);
 }
 
+void editorRowDelChar(erow *row, int at) {
+  if (at < 0 || at >= row->size)
+    return;
+  memmove(&row->chars[at], &row->chars[at + 1], row->size - at);
+  row->size--;
+  editorUpdateRow(row);
+  E.dirty++;
+}
+
 /*** editor operations ***/
 
 void editorInsertChar(int c) {
@@ -299,6 +308,18 @@ void editorInsertChar(int c) {
   editorRowInsertChar(&E.row[E.cy], E.cx, c);
   E.cx++;
   E.dirty++;
+}
+
+void editorDelChar() {
+  // If the cursor's past the end of the file, then return
+  if (E.cy == E.numrows)
+    return;
+
+  erow *row = &E.row[E.cy];
+  if (E.cx > 0) {
+    editorRowDelChar(row, E.cx - 1);
+    E.cx--;
+  }
 }
 
 /*** file i/o ***/
@@ -544,7 +565,7 @@ void editorSetStatusMessage(const char *fmt, ...) {
 
 /*** input ***/
 
-void editorMoveCusor(int key) {
+void editorMoveCursor(int key) {
   erow *row = (E.cy >= E.numrows) ? NULL : &E.row[E.cy];
 
   switch (key) {
@@ -624,7 +645,9 @@ void editorProcessKeypress() {
   case BACKSPACE:
   case CTRL_KEY('h'):
   case DEL_KEY:
-    /* TODO*/
+    if (c == DEL_KEY)
+      editorMoveCursor(ARROW_RIGHT);
+    editorDelChar();
     break;
 
   case PAGE_UP:
@@ -639,7 +662,7 @@ void editorProcessKeypress() {
 
     int times = E.screenrows;
     while (times--) {
-      editorMoveCusor(c == PAGE_UP ? ARROW_UP : ARROW_DOWN);
+      editorMoveCursor(c == PAGE_UP ? ARROW_UP : ARROW_DOWN);
     }
   }
 
@@ -647,7 +670,7 @@ void editorProcessKeypress() {
   case ARROW_DOWN:
   case ARROW_LEFT:
   case ARROW_RIGHT:
-    editorMoveCusor(c);
+    editorMoveCursor(c);
     break;
 
   case CTRL_KEY('l'):
