@@ -23,7 +23,7 @@
 #define KILO_TAB_STOP 8
 #define KILO_QUIT_TIMES 3
 
-#define CTRL_KEY(k) ((k)&0x1f)
+#define CTRL_KEY(k) ((k) & 0x1f)
 
 enum editorKey {
   BACKSPACE = 127,
