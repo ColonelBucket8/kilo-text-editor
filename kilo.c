@@ -777,11 +777,13 @@ void editorMoveCursor(int key) {
     }
     break;
   case ARROW_UP:
+  case CTRL_KEY('p'):
     if (E.cy != 0) {
       E.cy--;
     }
     break;
   case ARROW_DOWN:
+  case CTRL_KEY('n'):
     if (E.cy < E.numrows) {
       E.cy++;
     }
@@ -867,6 +869,8 @@ void editorProcessKeypress() {
   case ARROW_DOWN:
   case ARROW_LEFT:
   case ARROW_RIGHT:
+  case CTRL_KEY('n'):
+  case CTRL_KEY('p'):
     editorMoveCursor(c);
     break;
 
